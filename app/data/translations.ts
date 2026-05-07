@@ -8,16 +8,16 @@ export const translations = {
     heroTag: "Welcome",
     heroTitle: "Hi, I'm Rubim",
     heroDescription:
-      "Lua developer passionate about creating fun and engaging experiences on Roblox. I love building games that bring players together and make them smile.",
+      "Roblox developer focused on scripting and building engaging experiences on the platform.",
     heroCta: "Explore my projects",
     heroLearnMore: "Learn more",
 
     aboutTag: "About me",
     aboutTitle: "Who I am",
     aboutP1:
-      "I'm a Roblox developer specializing in Lua scripting. Over the past 2 years I've been crafting gameplay systems, building mechanics, and polishing experiences that players genuinely enjoy. I care deeply about the quality of every game I ship.",
+      "I'm a Roblox developer with experience in Lua scripting, gameplay systems, and game mechanics. I focus on delivering solid, well-crafted experiences.",
     aboutP2:
-      "From physics sandboxes to escape games and idle clickers, I enjoy tackling all kinds of projects. I'm always learning, always iterating, and always looking for ways to make something more fun. Game development isn't just my job — it's what I love to do.",
+      "I've worked on a variety of project types and enjoy taking on new challenges. I'm always looking to improve and grow as a developer.",
     aboutYears: "Years experience",
     aboutProjects: "Projects done",
     aboutClients: "Happy clients",
@@ -44,16 +44,16 @@ export const translations = {
     heroTag: "Bem-vindo",
     heroTitle: "Olá, eu sou Rubim",
     heroDescription:
-      "Desenvolvedor Lua apaixonado por criar experiências divertidas no Roblox. Adoro criar jogos que unem jogadores e os fazem sorrir.",
+      "Desenvolvedor Roblox focado em scripting e na criação de experiências envolventes na plataforma.",
     heroCta: "Explorar meus projetos",
     heroLearnMore: "Saiba mais",
 
     aboutTag: "Sobre mim",
     aboutTitle: "Quem eu sou",
     aboutP1:
-      "Sou um desenvolvedor Roblox especializado em Lua. Nos últimos 2 anos venho criando sistemas de gameplay, mecânicas e experiências que os jogadores realmente curtem.",
+      "Sou um desenvolvedor Roblox com experiência em Lua, sistemas de gameplay e mecânicas de jogo. Foco em entregar experiências bem feitas e consistentes.",
     aboutP2:
-      "De sandboxes de física a jogos de fuga e idle clickers, gosto de encarar todo tipo de projeto. Desenvolvimento de jogos não é só o meu trabalho — é o que eu amo fazer.",
+      "Já trabalhei em diferentes tipos de projeto e gosto de encarar novos desafios. Estou sempre buscando melhorar e evoluir como desenvolvedor.",
     aboutYears: "Anos de experiência",
     aboutProjects: "Projetos feitos",
     aboutClients: "Clientes satisfeitos",
