@@ -10,8 +10,12 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "GazinDev",
-  description: "mudar dps",
+  title: "Rubim Dev",
+  description: "Roblox Lua developer crafting fun and engaging experiences.",
+  icons: {
+    icon: "/RubimLogoPng.png",
+    apple: "/RubimLogoPng.png",
+  },
 };
 
 export default function RootLayout({

@@ -5,7 +5,10 @@ import { Home, User, FolderGit2, Mail, ArrowRight, AtSign, Globe, Eye, Menu, X }
 import ProjectsCarousel from "./components/ProjectsCarousel";
 import { useLanguage } from "./components/LanguageProvider";
 import { projects } from "./data/projects";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import MouseGlow from "./components/MouseGlow";
+import { useScrollReveal } from "./hooks/useScrollReveal";
+import { useCountUp } from "./hooks/useCountUp";
 
 const totalVisits = projects.reduce((acc, p) => acc + p.visits, 0);
 
@@ -15,9 +18,64 @@ function formatVisits(n: number) {
   return n.toLocaleString();
 }
 
+function StatCard({
+  raw,
+  label,
+  green,
+  started,
+  format,
+}: {
+  raw: number;
+  label: string;
+  green?: boolean;
+  started: boolean;
+  format?: (n: number) => string;
+}) {
+  const counted = useCountUp(raw, 1800, started);
+  const display = format ? format(counted) : String(counted);
+  return (
+    <div className="flex flex-col gap-2 bg-[#08080f] p-8 transition-colors duration-300 hover:bg-white/[0.03]">
+      <span className={`text-3xl font-black tracking-tight tabular-nums ${
+        green ? "text-violet-300" : "text-white"
+      }`}>{display}+</span>
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-white/25">{label}</span>
+    </div>
+  );
+}
+
 export default function House() {
   const { lang, setLang, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [liveCCU, setLiveCCU] = useState(0);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
+
+  useScrollReveal();
+
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStatsVisible(true); obs.disconnect(); } },
+      { threshold: 0.3 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const fetchCCU = () => {
+      fetch("/api/playing")
+        .then((r) => (r.ok ? r.json() : {}))
+        .then((data: Record<string, number>) => {
+          setLiveCCU(Object.values(data).reduce((a, b) => a + b, 0));
+        })
+        .catch(() => {});
+    };
+    fetchCCU();
+    const id = setInterval(fetchCCU, 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   const navItems = [
     { label: t("navHome"),     href: "#home",     icon: Home },
@@ -27,26 +85,22 @@ export default function House() {
 
   return (
     <>
-    <div className="relative min-h-screen w-full overflow-x-clip bg-[#0a0a0a]">
-      {/* Header */}
+      <MouseGlow />
+    <div className="relative min-h-screen w-full overflow-x-clip bg-[#08080f]">
       <header className="fixed top-5 left-1/2 z-50 w-full max-w-2xl -translate-x-1/2 px-4">
         <nav className="relative flex items-center justify-between rounded-2xl pl-4 pr-3 py-3">
-          {/* glass background */}
           <div className="pointer-events-none absolute inset-0 rounded-2xl border border-white/[0.09] bg-white/[0.04] shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl" />
-          {/* top shine */}
           <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-          {/* Logo */}
           <Image
-            src="/gazin.png"
-            alt="Gazin"
+            src="/RubimLogoPng.png"
+            alt="Rubim"
             width={72}
             height={24}
             priority
             className="relative opacity-90"
           />
 
-          {/* Nav — desktop only */}
           <ul className="relative hidden md:flex items-center gap-0.5">
             {navItems.map(({ label, href, icon: Icon }) => (
               <li key={href}>
@@ -62,9 +116,7 @@ export default function House() {
             ))}
           </ul>
 
-          {/* Right side — desktop only */}
           <div className="relative hidden md:flex items-center gap-2">
-            {/* Language toggle */}
             <button
               onClick={() => setLang(lang === "en" ? "pt" : "en")}
               className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-white/40 transition-all duration-200 hover:text-white hover:bg-white/[0.06]"
@@ -75,17 +127,15 @@ export default function House() {
               </span>
             </button>
 
-            {/* Contact button */}
             <a
               href="#contact"
-              className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-black tracking-wide transition-all duration-200 hover:bg-zinc-200 active:scale-95"
+              className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-xs font-semibold text-white tracking-wide transition-all duration-200 hover:bg-violet-500 active:scale-95"
             >
               <Mail size={14} strokeWidth={2} />
               {t("navContact")}
             </a>
           </div>
 
-          {/* Mobile right: lang + hamburger */}
           <div className="relative flex items-center gap-1 md:hidden">
             <button
               onClick={() => setLang(lang === "en" ? "pt" : "en")}
@@ -106,9 +156,8 @@ export default function House() {
           </div>
         </nav>
 
-        {/* Mobile dropdown */}
         <div
-          className={`relative mt-2 overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0d0d0d]/95 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 md:hidden ${
+          className={`relative mt-2 overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0d0d14]/95 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 md:hidden ${
             menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
           }`}
         >
@@ -128,7 +177,7 @@ export default function House() {
             <a
               href="#contact"
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-all duration-200 hover:bg-zinc-200 active:scale-[0.98]"
+              className="flex items-center gap-3 rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-violet-500 active:scale-[0.98]"
             >
               <Mail size={15} strokeWidth={2} />
               {t("navContact")}
@@ -137,25 +186,19 @@ export default function House() {
         </div>
       </header>
 
-      {/* Glow top-left */}
-      <div className="pointer-events-none absolute -top-32 -left-32 h-[600px] w-[600px] rounded-full bg-zinc-500 opacity-[0.08] blur-[130px]" />
+      <div className="pointer-events-none absolute -top-32 -left-32 h-[600px] w-[600px] rounded-full bg-violet-700 opacity-[0.10] blur-[130px]" />
 
-      {/* Glow center */}
-      <div className="pointer-events-none absolute top-1/2 left-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-400 opacity-[0.06] blur-[160px]" />
+      <div className="pointer-events-none absolute top-1/2 left-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600 opacity-[0.07] blur-[160px]" />
 
-      {/* Glow bottom-right */}
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-[600px] w-[600px] rounded-full bg-zinc-500 opacity-[0.07] blur-[130px]" />
+      <div className="pointer-events-none absolute -bottom-32 -right-32 h-[600px] w-[600px] rounded-full bg-violet-700 opacity-[0.09] blur-[130px]" />
 
-      {/* Subtle noise texture */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")", backgroundRepeat: "repeat", backgroundSize: "200px 200px" }}
       />
 
-      {/* Hero */}
       <section id="home" className="relative flex min-h-[80vh] items-center justify-center px-6 pt-28">
-        <div className="relative flex max-w-lg flex-col gap-8">
-          {/* Tag */}
+        <div className="relative flex max-w-lg flex-col gap-8 reveal">
           <div className="flex items-center gap-2">
             <span className="h-px w-8 bg-white/20" />
             <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
@@ -163,21 +206,18 @@ export default function House() {
             </span>
           </div>
 
-          {/* Title */}
           <h1 className="text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl">
             {t("heroTitle")}
           </h1>
 
-          {/* Description */}
           <p className="max-w-md text-base leading-7 text-white/35 font-light">
             {t("heroDescription")}
           </p>
 
-          {/* CTA */}
           <div className="flex items-center gap-4 pt-2">
             <a
               href="#projects"
-              className="group flex items-center gap-2.5 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition-all duration-200 hover:bg-zinc-200 active:scale-[0.97]"
+              className="group flex items-center gap-2.5 rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-violet-500 active:scale-[0.97]"
             >
               {t("heroCta")}
               <ArrowRight size={15} strokeWidth={2} className="transition-transform duration-200 group-hover:translate-x-1" />
@@ -190,24 +230,28 @@ export default function House() {
             </a>
           </div>
 
-          {/* Total visits badge */}
-          <div className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.04] px-4 py-2.5 w-fit">
-            <Eye size={13} strokeWidth={1.5} className="text-white/30 shrink-0" />
-            <span className="text-xs text-white/35">
-              <span className="font-semibold text-white/70">{formatVisits(totalVisits)}+</span>
-              {" "}{lang === "en" ? "total visits across" : "visitas no total em"}{" "}
-              <span className="font-semibold text-white/70">{projects.length}</span>
-              {" "}{lang === "en" ? "games" : "games"}
-            </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/[0.06] px-4 py-2.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse shrink-0" />
+              <span className="text-xs text-white/50">
+                <span className="font-semibold text-violet-300">{liveCCU > 0 ? `${formatVisits(liveCCU)}+` : "..."}</span>
+                {" "}{lang === "en" ? "live CCU" : "CCU ao vivo"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.04] px-4 py-2.5">
+              <Eye size={13} strokeWidth={1.5} className="text-white/30 shrink-0" />
+              <span className="text-xs text-white/35">
+                <span className="font-semibold text-white/70">{formatVisits(totalVisits)}+</span>
+                {" "}{lang === "en" ? "total visits" : "visitas no total"}
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* About */}
       <section id="about" className="relative px-6 pt-16 pb-32">
         <div className="mx-auto flex max-w-4xl flex-col gap-16 md:flex-row md:items-start md:gap-20">
-          {/* Left */}
-          <div className="flex shrink-0 flex-col gap-4">
+          <div className="reveal flex shrink-0 flex-col gap-4">
             <div className="flex items-center gap-2">
               <span className="h-px w-8 bg-white/20" />
               <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
@@ -219,8 +263,7 @@ export default function House() {
             </h2>
           </div>
 
-          {/* Right */}
-          <div className="flex flex-col gap-6">
+          <div className="reveal reveal-delay-2 flex flex-col gap-6">
             <p className="text-base leading-7 text-white/40 font-light">
               {t("aboutP1")}
             </p>
@@ -229,7 +272,7 @@ export default function House() {
             </p>
             <div className="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-3">
               {[
-                { value: "5+", label: t("aboutYears") },
+                { value: "2+", label: t("aboutYears") },
                 { value: "30+", label: t("aboutProjects") },
                 { value: "15+", label: t("aboutClients") },
               ].map(({ value, label }) => (
@@ -243,11 +286,18 @@ export default function House() {
         </div>
       </section>
 
-      {/* Projects */}
+      <section id="stats" className="relative px-6 pb-16">
+        <div ref={statsRef} className="reveal mx-auto max-w-5xl overflow-hidden rounded-2xl border border-white/[0.06] grid grid-cols-2 gap-px bg-white/[0.05] sm:grid-cols-4">
+          <StatCard raw={projects.length} label={lang === "en" ? "Games Shipped" : "Jogos Publicados"} started={statsVisible} />
+          <StatCard raw={2} label={lang === "en" ? "Years Experience" : "Anos de Experiência"} started={statsVisible} />
+          <StatCard raw={totalVisits} label={lang === "en" ? "Total Visits" : "Visitas Totais"} started={statsVisible} format={formatVisits} />
+          <StatCard raw={liveCCU} label={lang === "en" ? "Live CCU" : "CCU ao Vivo"} green started={statsVisible} format={formatVisits} />
+        </div>
+      </section>
+
       <section id="projects" className="relative py-32">
         <div className="mx-auto max-w-6xl px-6">
-          {/* Header */}
-          <div className="mb-14 flex flex-col gap-4">
+          <div className="reveal mb-14 flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <span className="h-px w-8 bg-white/20" />
               <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
@@ -262,14 +312,12 @@ export default function House() {
             </p>
           </div>
 
-          {/* Carousel */}
           <ProjectsCarousel />
         </div>
       </section>
 
-      {/* Contact */}
       <section id="contact" className="relative px-6 py-32">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="reveal mx-auto max-w-2xl text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="h-px w-8 bg-white/20" />
             <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
@@ -285,9 +333,8 @@ export default function House() {
           </p>
 
           <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            {/* Email */}
             <a
-              href="mailto:gazindev@gmail.com"
+              href="mailto:rubimdevlua@gmail.com"
               className="group relative flex w-full items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-6 py-5 transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.06] sm:w-auto"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.06]">
@@ -296,14 +343,13 @@ export default function House() {
               <div className="text-left">
                 <p className="text-xs text-white/30">{t("contactEmail")}</p>
                 <p className="text-sm font-medium text-white/70 group-hover:text-white transition-colors">
-                  gazindev@gmail.com
+                  rubimdevlua@gmail.com
                 </p>
               </div>
             </a>
 
-            {/* Discord */}
             <a
-              href="https://discord.com/users/gazin.dev"
+              href="https://discord.gg/rubimdev"
               target="_blank"
               rel="noopener noreferrer"
               className="group relative flex w-full items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-6 py-5 transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.06] sm:w-auto"
@@ -316,7 +362,7 @@ export default function House() {
               <div className="text-left">
                 <p className="text-xs text-white/30">{t("contactDiscord")}</p>
                 <p className="text-sm font-medium text-white/70 group-hover:text-white transition-colors">
-                  gazin.dev
+                  rubimdev
                 </p>
               </div>
             </a>
@@ -324,13 +370,10 @@ export default function House() {
         </div>
       </section>
 
-      {/* Top horizontal line accent */}
       <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
     </div>
 
-    {/* Footer */}
-    <footer className="relative overflow-hidden border-t border-white/[0.06] bg-[#050505] h-48">
-      {/* Animated GAZIN marquee background */}
+    <footer className="relative overflow-hidden border-t border-white/[0.06] bg-[#050508] h-48">
       <div className="pointer-events-none absolute inset-0 flex flex-col justify-center gap-6">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="relative flex w-full">
@@ -345,7 +388,7 @@ export default function House() {
                   key={j}
                   className="mx-6 text-6xl font-black uppercase italic tracking-widest text-white/[0.08] sm:text-8xl"
                 >
-                  GAZIN
+                  RUBIM
                 </span>
               ))}
             </div>
@@ -361,7 +404,7 @@ export default function House() {
                   key={j}
                   className="mx-6 text-6xl font-black uppercase italic tracking-widest text-white/[0.08] sm:text-8xl"
                 >
-                  GAZIN
+                  RUBIM
                 </span>
               ))}
             </div>
