@@ -77,7 +77,7 @@ export default function ProjectsCarousel() {
   const row2 = projects.slice(half);
 
   return (
-    <div className="carousel-wrapper flex flex-col gap-4 overflow-hidden">
+    <div className="carousel-wrapper carousel-mask flex flex-col gap-4 overflow-hidden">
       <div className="flex overflow-hidden">
         <div
           className="carousel-track flex gap-4 animate-marquee-left"

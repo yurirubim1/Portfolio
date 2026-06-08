@@ -7,7 +7,10 @@ import { useLanguage } from "./components/LanguageProvider";
 import { projects } from "./data/projects";
 import { useState, useEffect, useRef } from "react";
 import MouseGlow from "./components/MouseGlow";
-import { useScrollReveal } from "./hooks/useScrollReveal";
+import ScrollProgress from "./components/ScrollProgress";
+import ParticleField from "./components/ParticleField";
+import Reveal from "./components/Reveal";
+import { useParallax } from "./hooks/useParallax";
 import { useCountUp } from "./hooks/useCountUp";
 
 const totalVisits = projects.reduce((acc, p) => acc + p.visits, 0);
@@ -50,13 +53,13 @@ export default function House() {
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
 
-  useScrollReveal();
+  useParallax();
 
   useEffect(() => {
     const el = statsRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setStatsVisible(true); obs.disconnect(); } },
+      ([entry]) => setStatsVisible(entry.isIntersecting),
       { threshold: 0.3 }
     );
     obs.observe(el);
@@ -85,8 +88,10 @@ export default function House() {
 
   return (
     <>
+      <ScrollProgress />
       <MouseGlow />
-    <div className="relative min-h-screen w-full overflow-x-clip bg-[#08080f]">
+      <ParticleField />
+    <div className="relative z-10 min-h-screen w-full overflow-x-clip">
       <header className="fixed top-5 left-1/2 z-50 w-full max-w-2xl -translate-x-1/2 px-4">
         <nav className="relative flex items-center justify-between rounded-2xl pl-4 pr-3 py-3">
           <div className="pointer-events-none absolute inset-0 rounded-2xl border border-white/[0.09] bg-white/[0.04] shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl" />
@@ -186,38 +191,43 @@ export default function House() {
         </div>
       </header>
 
-      <div className="pointer-events-none absolute -top-32 -left-32 h-[600px] w-[600px] rounded-full bg-violet-700 opacity-[0.10] blur-[130px]" />
+      <div data-parallax="0.15" className="pointer-events-none absolute -top-32 -left-32 h-[600px] w-[600px] rounded-full bg-violet-700 opacity-[0.10] blur-[130px] will-change-transform" />
 
       <div className="pointer-events-none absolute top-1/2 left-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600 opacity-[0.07] blur-[160px]" />
 
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-[600px] w-[600px] rounded-full bg-violet-700 opacity-[0.09] blur-[130px]" />
+      <div data-parallax="0.2" className="pointer-events-none absolute -bottom-32 -right-32 h-[600px] w-[600px] rounded-full bg-violet-700 opacity-[0.09] blur-[130px] will-change-transform" />
 
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")", backgroundRepeat: "repeat", backgroundSize: "200px 200px" }}
       />
 
-      <section id="home" className="relative flex min-h-[80vh] items-center justify-center px-6 pt-28">
-        <div className="relative flex max-w-lg flex-col gap-8 reveal">
-          <div className="flex items-center gap-2">
-            <span className="h-px w-8 bg-white/20" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
+      <section id="home" className="relative flex min-h-[88vh] items-center justify-center px-6 pt-28">
+        <div className="relative flex max-w-lg flex-col gap-8">
+          <Reveal dir="up" delay={0} className="flex items-center gap-2">
+            <span className="h-px w-8 bg-gradient-to-r from-violet-400 to-transparent" />
+            <span className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/60">
               {t("heroTag")}
             </span>
-          </div>
+          </Reveal>
 
-          <h1 className="text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl">
+          <Reveal
+            as="h1"
+            dir="up"
+            delay={100}
+            className="bg-gradient-to-br from-white via-white to-violet-200/70 bg-clip-text text-4xl font-bold leading-[1.15] tracking-tight text-transparent sm:text-5xl"
+          >
             {t("heroTitle")}
-          </h1>
+          </Reveal>
 
-          <p className="max-w-md text-base leading-7 text-white/35 font-light">
+          <Reveal as="p" dir="up" delay={200} className="max-w-md text-base leading-7 text-white/40 font-light">
             {t("heroDescription")}
-          </p>
+          </Reveal>
 
-          <div className="flex items-center gap-4 pt-2">
+          <Reveal dir="up" delay={300} className="flex items-center gap-4 pt-2">
             <a
               href="#projects"
-              className="group flex items-center gap-2.5 rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-violet-500 active:scale-[0.97]"
+              className="group flex items-center gap-2.5 rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_30px_-8px_rgba(124,58,237,0.7)] transition-all duration-200 hover:bg-violet-500 hover:shadow-[0_8px_40px_-6px_rgba(124,58,237,0.9)] active:scale-[0.97]"
             >
               {t("heroCta")}
               <ArrowRight size={15} strokeWidth={2} className="transition-transform duration-200 group-hover:translate-x-1" />
@@ -228,9 +238,9 @@ export default function House() {
             >
               {t("heroLearnMore")}
             </a>
-          </div>
+          </Reveal>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <Reveal dir="up" delay={400} className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/[0.06] px-4 py-2.5">
               <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse shrink-0" />
               <span className="text-xs text-white/50">
@@ -245,41 +255,46 @@ export default function House() {
                 {" "}{lang === "en" ? "total visits" : "visitas no total"}
               </span>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       <section id="about" className="relative px-6 pt-16 pb-32">
         <div className="mx-auto flex max-w-4xl flex-col gap-16 md:flex-row md:items-start md:gap-20">
-          <div className="reveal flex shrink-0 flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <span className="h-px w-8 bg-white/20" />
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
+          <div className="flex shrink-0 flex-col gap-4">
+            <Reveal dir="left" delay={0} className="flex items-center gap-2">
+              <span className="h-px w-8 bg-gradient-to-r from-violet-400 to-transparent" />
+              <span className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/60">
                 {t("aboutTag")}
               </span>
-            </div>
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            </Reveal>
+            <Reveal
+              as="h2"
+              dir="left"
+              delay={100}
+              className="bg-gradient-to-br from-white to-violet-200/70 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl"
+            >
               {t("aboutTitle")}
-            </h2>
+            </Reveal>
           </div>
 
-          <div className="reveal reveal-delay-2 flex flex-col gap-6">
-            <p className="text-base leading-7 text-white/40 font-light">
+          <div className="flex flex-col gap-6">
+            <Reveal as="p" dir="up" delay={150} className="text-base leading-7 text-white/40 font-light">
               {t("aboutP1")}
-            </p>
-            <p className="text-base leading-7 text-white/40 font-light">
+            </Reveal>
+            <Reveal as="p" dir="up" delay={250} className="text-base leading-7 text-white/40 font-light">
               {t("aboutP2")}
-            </p>
+            </Reveal>
             <div className="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-3">
               {[
                 { value: "2+", label: t("aboutYears") },
                 { value: "30+", label: t("aboutProjects") },
                 { value: "15+", label: t("aboutClients") },
-              ].map(({ value, label }) => (
-                <div key={label} className="flex flex-col gap-1">
+              ].map(({ value, label }, i) => (
+                <Reveal key={label} dir="up" delay={350 + i * 100} className="flex flex-col gap-1">
                   <span className="text-2xl font-bold text-white">{value}</span>
                   <span className="text-xs text-white/30">{label}</span>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -287,45 +302,54 @@ export default function House() {
       </section>
 
       <section id="stats" className="relative px-6 pb-16">
-        <div ref={statsRef} className="reveal mx-auto max-w-5xl overflow-hidden rounded-2xl border border-white/[0.06] grid grid-cols-2 gap-px bg-white/[0.05] sm:grid-cols-4">
-          <StatCard raw={projects.length} label={lang === "en" ? "Games Shipped" : "Jogos Publicados"} started={statsVisible} />
-          <StatCard raw={2} label={lang === "en" ? "Years Experience" : "Anos de Experiência"} started={statsVisible} />
-          <StatCard raw={totalVisits} label={lang === "en" ? "Total Visits" : "Visitas Totais"} started={statsVisible} format={formatVisits} />
-          <StatCard raw={liveCCU} label={lang === "en" ? "Live CCU" : "CCU ao Vivo"} green started={statsVisible} format={formatVisits} />
-        </div>
+        <Reveal dir="scale" className="mx-auto max-w-5xl">
+          <div ref={statsRef} className="overflow-hidden rounded-2xl border border-white/[0.06] grid grid-cols-2 gap-px bg-white/[0.05] sm:grid-cols-4">
+            <StatCard raw={projects.length} label={lang === "en" ? "Games Shipped" : "Jogos Publicados"} started={statsVisible} />
+            <StatCard raw={2} label={lang === "en" ? "Years Experience" : "Anos de Experiência"} started={statsVisible} />
+            <StatCard raw={totalVisits} label={lang === "en" ? "Total Visits" : "Visitas Totais"} started={statsVisible} format={formatVisits} />
+            <StatCard raw={liveCCU} label={lang === "en" ? "Live CCU" : "CCU ao Vivo"} green started={statsVisible} format={formatVisits} />
+          </div>
+        </Reveal>
       </section>
 
       <section id="projects" className="relative py-32">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="reveal mb-14 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <span className="h-px w-8 bg-white/20" />
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
+          <div className="mb-14 flex flex-col gap-4">
+            <Reveal dir="up" delay={0} className="flex items-center gap-2">
+              <span className="h-px w-8 bg-gradient-to-r from-violet-400 to-transparent" />
+              <span className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/60">
                 {t("projectsTag")}
               </span>
-            </div>
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            </Reveal>
+            <Reveal
+              as="h2"
+              dir="up"
+              delay={100}
+              className="bg-gradient-to-br from-white to-violet-200/70 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl"
+            >
               {t("projectsTitle")}
-            </h2>
-            <p className="max-w-md text-base leading-7 text-white/35 font-light">
+            </Reveal>
+            <Reveal as="p" dir="up" delay={200} className="max-w-md text-base leading-7 text-white/35 font-light">
               {t("projectsDescription")}
-            </p>
+            </Reveal>
           </div>
 
-          <ProjectsCarousel />
+          <Reveal dir="scale" delay={150}>
+            <ProjectsCarousel />
+          </Reveal>
         </div>
       </section>
 
       <section id="contact" className="relative px-6 py-32">
-        <div className="reveal mx-auto max-w-2xl text-center">
+        <Reveal dir="right" duration={850} className="mx-auto max-w-2xl text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="h-px w-8 bg-white/20" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/30">
+            <span className="h-px w-8 bg-gradient-to-r from-transparent to-violet-400" />
+            <span className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/60">
               {t("contactTag")}
             </span>
-            <span className="h-px w-8 bg-white/20" />
+            <span className="h-px w-8 bg-gradient-to-l from-transparent to-violet-400" />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="bg-gradient-to-br from-white to-violet-200/70 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
             {t("contactTitle")}
           </h2>
           <p className="mx-auto mt-4 max-w-md text-base leading-7 text-white/35 font-light">
@@ -367,7 +391,7 @@ export default function House() {
               </div>
             </a>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />

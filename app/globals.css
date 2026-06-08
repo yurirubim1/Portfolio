@@ -6,7 +6,7 @@ html:focus-within {
 }
 
 :root {
-  --background: #0a0a0f;
+  --background: #08080f;
   --foreground: #f0eeff;
   --accent: #7c3aed;
   --accent-light: #a78bfa;
@@ -21,7 +21,7 @@ html:focus-within {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0f;
+    --background: #08080f;
     --foreground: #f0eeff;
   }
 }
@@ -61,6 +61,24 @@ body {
   animation-play-state: paused;
 }
 
+/* Soft fade on the carousel edges so cards slide in/out gracefully */
+.carousel-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
 /* ── Mouse glow ── */
 .mouse-glow {
   pointer-events: none;
@@ -77,21 +95,7 @@ body {
   mix-blend-mode: screen;
 }
 
-/* ── Scroll reveal ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-/* Safety: if JS disabled, show everything */
+/* Scroll-reveal is handled by the <Reveal> component (inline styles). */
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
+  html, html:focus-within { scroll-behavior: auto !important; }
 }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
