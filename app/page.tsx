@@ -202,8 +202,23 @@ export default function House() {
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")", backgroundRepeat: "repeat", backgroundSize: "200px 200px" }}
       />
 
-      <section id="home" className="relative flex min-h-[88vh] items-center justify-center px-6 pt-28">
-        <div className="relative flex max-w-lg flex-col gap-8">
+      <section id="home" className="relative flex min-h-[88vh] items-center justify-center overflow-hidden px-6 pt-28">
+        <div className="pointer-events-none absolute right-0 top-1/2 z-0 hidden -translate-y-1/2 translate-x-[44%] md:block">
+          <div className="animate-slide-in-right">
+            <Image
+              src="/boneco-hd.png"
+              alt="Avatar"
+              width={953}
+              height={742}
+              priority
+              quality={100}
+              unoptimized
+              className="h-[40rem] w-[40rem] -rotate-[32deg] select-none object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.5)] lg:h-[48rem] lg:w-[48rem]"
+              draggable={false}
+            />
+          </div>
+        </div>
+        <div className="relative z-10 flex w-full max-w-lg flex-col gap-8">
           <Reveal dir="up" delay={0} className="flex items-center gap-2">
             <span className="h-px w-8 bg-gradient-to-r from-violet-400 to-transparent" />
             <span className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/60">

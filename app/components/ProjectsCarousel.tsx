@@ -31,12 +31,6 @@ function GameCard({ project, live }: { project: Project; live?: number }) {
           sizes="192px"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-        {live !== undefined && live > 0 && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 rounded-lg bg-green-500/20 px-2 py-0.5 backdrop-blur-md border border-green-500/20">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
-            <span className="text-[10px] font-semibold text-green-300">{formatNumber(live)}</span>
-          </div>
-        )}
         <div className="absolute bottom-2 right-2 rounded-lg bg-black/50 p-1.5 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
           <ExternalLink size={10} className="text-white/80" />
         </div>
