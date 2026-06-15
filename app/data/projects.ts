@@ -97,4 +97,11 @@ export const projects = [
     thumbnail: "https://tr.rbxcdn.com/180DAY-c222c2bf14adaa696d6a0adb888b2c20/512/512/Image/Png/noFilter",
     url: "https://www.roblox.com/games/119383854415651",
   },
+  {
+    name: "Kick A Lucky Block for Soccer Cards",
+    visits: 7502112,
+    universeId: 10092535246,
+    thumbnail: "https://tr.rbxcdn.com/180DAY-533a4f43a1be31228fea37f7bee1e18d/512/512/Image/Png/noFilter",
+    url: "https://www.roblox.com/games/114115486822297",
+  },
 ];
